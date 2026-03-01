@@ -1,0 +1,815 @@
+<!DOCTYPE html> <!-- הכרזה על HTML5 -->
+<html lang="he" dir="rtl"> <!-- שפה עברית, כיוון מימין לשמאל -->
+
+<head>
+  <meta charset="UTF-8"> <!-- קידוד UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- התאמה למסכים שונים -->
+  <title>Project_Santi-Bot</title> <!-- כותרת הדף -->
+
+  <style>
+    /* --- עיצוב גוף הדף --- */
+    body {
+      background-color: #212121; /* צבע רקע כהה */
+      color: #e0e0e0; /* צבע טקסט בהיר */
+      font-family: Arial, sans-serif; /* פונט כללי */
+      margin: 0; /* ביטול מרווח ברירת מחדל */
+      display: flex; /* שימוש ב-flexbox */
+      min-height: 100vh; /* גובה מינימום מלא של החלון */
+    }
+
+    /* --- סרגל צד --- */
+    .sidebar {
+      background-color: #181818; /* צבע רקע הסרגל */
+      width: 220px; /* רוחב סרגל */
+      padding: 20px; /* ריווח פנימי */
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5); /* צל */
+      position: fixed; /* מיקום קבוע */
+      top: 0; /* למעלה */
+      right: 0; /* מימין */
+      height: 100%; /* גובה מלא */
+      z-index: 100; /* 💥 חשוב מאוד: מאפשר ללחוץ על הקישורים! */
+    }
+
+    .sidebar h2 {
+      color: #ffffff; /* צבע כותרת */
+      font-size: 1.5rem; /* גודל פונט */
+      margin-bottom: 20px; /* ריווח תחתון */
+      border-bottom: 2px solid #007bff; /* קו תחתון כחול */
+      padding-bottom: 10px; /* ריווח פנימי מתחת לכותרת */
+    }
+
+    .sidebar ul {
+      list-style: none; /* ביטול נקודות ברשימה */
+      padding: 0; /* ביטול ריווח פנימי */
+      margin: 0; /* ביטול שוליים */
+    }
+
+    .sidebar ul li {
+      margin: 15px 0; /* מרווח בין פריטים */
+    }
+
+    .sidebar ul li a {
+      color: #e0e0e0; /* צבע קישור */
+      text-decoration: none; /* ביטול קו תחתון */
+      font-size: 1.1rem; /* גודל פונט */
+      transition: color 0.3s ease; /* שינוי צבע חלק */
+      cursor: pointer; /* סמן יד */
+    }
+
+    .sidebar ul li a:hover {
+      color: #007bff; /* שינוי צבע בהעברת עכבר */
+    }
+
+    /* --- תוכן הדף --- */
+    .content-container {
+      flex: 1; /* תופס את כל השטח הפנוי */
+      padding: 30px; /* ריווח פנימי */
+      max-width: 900px; /* רוחב מקסימלי */
+      margin: 0 auto; /* מרכז אופקי */
+      margin-right: 260px; /* ריווח מימין לסרגל צד */
+    }
+
+    .page-title {
+      color: #ffffff; /* צבע כותרת */
+      font-size: 2rem; /* גודל כותרת */
+      text-align: center; /* יישור מרכזי */
+    }
+
+    p {
+      font-size: 1.2rem; /* גודל פסקה */
+      line-height: 1.5; /* גובה שורה */
+      text-align: center; /* יישור מרכזי */
+    }
+
+    /* --- קונטיינר סרטון --- */
+    .video-section {
+      position: relative; /* מיקום יחסי לאלמנטים פנימיים */
+      width: 100%; /* רוחב מלא */
+      max-width: 600px; /* רוחב מקסימלי */
+      margin: 20px auto; /* ריווח אנכי ומרכז אופקי */
+      padding: 10px; /* ריווח פנימי */
+      background-color: #212121; /* צבע רקע */
+      box-sizing: border-box; /* חישוב כולל padding */
+      height: 340px; /* גובה */
+      border-radius: 8px; /* פינות מעוגלות */
+    }
+
+    .video-section img {
+      position: absolute; /* מיקום על הקונטיינר */
+      top: 0; /* למעלה */
+      left: 0; /* שמאל */
+      width: 100%; /* רוחב מלא */
+      height: 100%; /* גובה מלא */
+      object-fit: contain; /* שמירה על יחס תמונה */
+      cursor: pointer; /* סמן יד */
+      border-radius: 8px; /* פינות מעוגלות */
+      border: 3px solid #007bff; /* מסגרת כחולה */
+      box-sizing: border-box; /* <<< תיקון */
+    }
+
+    .video-player {
+      position: absolute; /* מיקום על התמונה */
+      top: 0;
+      left: 0;
+      width: 100%; /* רוחב מלא */
+      height: 100%; /* גובה מלא */
+      border-radius: 8px; /* פינות מעוגלות */
+      display: none; /* נסתר כברירת מחדל */
+      background: #000; /* רקע שחור */
+      border: 3px solid #007bff; /* מסגרת כחולה */
+      box-sizing: border-box; /* <<< תיקון */
+    }
+
+    .video-player.show {
+      display: block; /* מוצג כאשר לוחצים על התמונה */
+    }
+
+    .video-player iframe {
+      width: 100%; /* רוחב מלא */
+      height: 100%; /* גובה מלא */
+      border-radius: 8px; /* פינות מעוגלות */
+    }
+
+    /* --- קטגוריות --- */
+    .category {
+      display: none; /* מוסתר כברירת מחדל */
+    }
+
+    .category.active {
+      display: block; /* מוצג כאשר פעיל */
+    }
+
+    /* בדיקות - טקסט מעל הסרטון */
+    .doc-date {
+      font-size: 1.3rem; /* גודל פונט */
+      font-weight: bold; /* מודגש */
+      color: #ffffff; /* צבע טקסט */
+      text-align: center; /* יישור מרכזי */
+      margin-bottom: 15px; /* ריווח תחתון */
+      background: rgba(0, 123, 255, 0.2); /* רקע כחול חצי שקוף */
+      padding: 10px; /* ריווח פנימי */
+      border-radius: 6px; /* פינות מעוגלות */
+    }
+
+    /* --- עיצוב כפתור ההורדה --- */
+    .download-button {
+      display: inline-block; 
+      background-color: #007bff; /* כחול */
+      color: #ffffff !important; /* טקסט לבן */
+      padding: 12px 30px; 
+      text-decoration: none; 
+      border-radius: 8px; 
+      font-size: 1.3rem !important; 
+      font-weight: bold; 
+      transition: background-color 0.3s ease; 
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); 
+    }
+
+    .download-button:hover {
+      background-color: #0056b3; 
+      text-decoration: none;
+    }
+     /* --- כללי עיצוב מיוחדים למסכים שרוחבם עד 768px (מובייל וטאבלטים קטנים) --- */
+/* --- כפתור המבורגר (ברירת מחדל: מוסתר בדסקטופ) --- */
+/* --- כפתור המבורגר (ברירת מחדל: מוסתר בדסקטופ) --- */
+ .hamburger {
+ display: none; 
+ position: fixed;
+ top: 15px;
+ right: 15px; /* 💥 תיקון: עבר מ-left ל-right */
+ z-index: 1000; /* ודא z-index גבוה יותר מהסיידבר (100) */
+ background: #007bff;
+ color: #ffffff;
+ border: none;
+ padding: 10px 15px;
+ font-size: 1.5rem;
+ cursor: pointer;
+ border-radius: 4px;
+ box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+ }
+   /* --- התאמות רספונסיביות לטלפונים וטאבלטים --- */
+@media (max-width: 1024px) {
+    /* 1. התאמת גוף הדף - מבטל את ה-flex של המחשב */
+    body {
+        display: block;
+        overflow-x: hidden; /* מונע גלילה לצדדים */
+    }
+
+    /* 2. סרגל הצד (Sidebar) - הופך לתפריט נפתח */
+    .sidebar {
+        width: 250px; 
+        position: fixed;
+        right: -270px; /* מוסתר מחוץ למסך */
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: #1a1a1a;
+        z-index: 2000;
+        height: 100vh;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    }
+    
+    .sidebar.open {
+        right: 0; /* נפתח בלחיצה */
+    }
+
+    /* 3. קונטיינר התוכן הראשי */
+    .content-container {
+        margin-right: 0 !important; /* ביטול המרווח של המחשב */
+        padding: 80px 20px 40px 20px; /* ריווח מההמבורגר ומהצדדים */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 4. וידאו וסרטונים - התאמה מושלמת לכל מסך */
+    .video-section {
+        height: auto !important; /* מבטל גובה קבוע */
+        aspect-ratio: 16 / 9; /* שומר על צורת וידאו תקנית */
+        width: 100%;
+        max-width: 100%;
+        margin: 20px 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* הנה המקום להוסיף את הקוד ששאלת עליו: */
+    .video-section img, 
+    .video-section .video-player {
+        position: absolute; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* 5. התאמת טקסטים למובייל */
+    .project-title-blue {
+        font-size: 1.6rem;
+        line-height: 1.3;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        text-align: right; /* קריאה נוחה יותר בעברית בנייד */
+    }
+
+    /* 6. כפתור הורדה - נוח ללחיצה עם האגודל */
+    .download-button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 15px;
+        font-size: 1.2rem !important;
+        box-sizing: border-box;
+    }
+
+    /* 7. כפתור המבורגר */
+    .hamburger {
+        display: block;
+        font-size: 2rem;
+        padding: 12px;
+        background: #007bff;
+        border-radius: 50%; /* הופך אותו לעגול ונוח */
+        width: 50px;
+        height: 50px;
+        line-height: 25px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+}
+
+    .circuit-section {
+    max-width: 850px; 
+    margin: 40px auto; 
+    padding: 0 15px;
+    direction: rtl;
+    text-align: center;
+}
+
+/* רק הכותרות הראשיות - בתכלת וממורכזות */
+.project-title-blue {
+    color: #007bff; /* תכלת */
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center; /* ממורכז */
+    display: block;
+    margin: 20px auto 30px auto; /* מרכוז הבלוק עצמו */
+    width: 100%;
+}
+
+.image-frame {
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+/* קלאס למרכוז טקסט (כמו ה"לחצו לצפייה") בלי לשנות לו את הצבע */
+.centered-text {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+}
+/* הצגת השרטוט - כאן נפתרת בעיית ה"סימן הקטן" */
+.circuit-display {
+    width: 100%;
+    max-width: 850px;
+    margin: 20px auto;
+    background: #ffffff; /* רקע לבן מבליט את השרטוט */
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 2px solid #007bff;
+}
+/* עיצוב המפריד */
+.separator {
+    margin: 40px auto;
+    width: 60%;
+    border: 0;
+    border-top: 1px solid #444;
+}
+/* עיצוב לתמונה גדולה וברורה */
+.circuit-container {
+    width: 100%;
+    max-width: 850px; /* גודל מקסימלי במחשב */
+    margin: 20px auto;
+    background: #ffffff; /* רקע לבן כדי שהשרטוט יבלוט */
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.full-view-img {
+    width: 100%;    /* תופס את כל רוחב הקונטיינר */
+    height: auto;   /* שומר על פרופורציות של השרטוט */
+    display: block;
+    border-radius: 4px;
+}
+/* גלריית תמונות - מותאמת למובייל ולדסקטופ */
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%; /* מונע גלישה */
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+.image-gallery figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* במובייל - תמונה אחת בשורה */
+    box-sizing: border-box;
+}
+
+.image-gallery img {
+    width: 100%;
+    max-width: 100%; 
+    height: 450px; /* 💥 הגדלתי מ-250 ל-450 כדי שיהיה גדול ומרשים */
+    object-fit: contain; /* 💥 שיניתי מ-cover ל-contain כדי שכל התמונה תיכנס מבלי להיחתך */
+    background-color: #1a1a1a; /* מוסיף רקע כהה למקרה שהתמונה בפורמט צר */
+    border-radius: 10px;
+    border: 2px solid #007bff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* התאמה לטלפון - שלא יהיה גבוה מדי במסך קטן */
+@media (max-width: 768px) {
+    .image-gallery img {
+        height: 300px; /* גובה מותאם אישית לנייד */
+    }
+}
+
+/* עיצוב פסקה ממורכזת */
+.centered-paragraph-container {
+    max-width: 100%; /* מותאם למובייל */
+    width: 850px;
+    margin: 40px auto;
+    text-align: center; /* מרכוז הטקסט */
+    padding: 0 15px;
+    box-sizing: border-box;
+    direction: rtl;
+}
+
+.centered-paragraph-container p {
+    text-align: center; /* מוודא שכל שורה בנפרד ממורכזת */
+    margin: 0 auto;
+    line-height: 1.8;
+    color: #e0e0e0;
+    font-size: 1.1rem;
+}
+  </style>
+</head>
+
+<body>
+  <button class="hamburger" onclick="toggleMenu()">
+ ☰ 
+ </button>
+  <!-- סרגל צד -->
+  <nav class="sidebar">
+    <h2>קטגוריות</h2> <!-- כותרת סרגל צד -->
+    <ul>
+      <li><a onclick="showCategory('home')">בית</a></li> <!-- הצגת קטגוריית הבית -->
+      <li><a onclick="showCategory('schem')">שרטוטים חשמליים</a></li>
+      <li><a onclick="showCategory('assembly')">הרכבת התותח והראדאר 🛠️</a></li>
+      <li><a onclick="showCategory('tests')">בדיקות</a></li> <!-- הצגת קטגוריית הבדיקות -->
+      <li><a onclick="showCategory('book')">הספר פרוייקט שלי 📚</a></li>
+    </ul>
+  </nav>
+
+<main class="content-container">
+<div id="home" class="category active">
+    <h1 class="project-title-blue">Santi-Bot: מערכת הגנה אוטונומית חכמה</h1>
+    <div class="image-gallery">
+        <figure>
+            <img src="P1.png" alt="זווית ישירה">
+            <figcaption style="color: #007bff; margin-top: 8px; font-weight: bold;">זווית ישירה על הפרויקט</figcaption>
+        </figure>
+        <figure>
+            <img src="P2.png" alt="זווית אחורית">
+            <figcaption style="color: #007bff; margin-top: 8px; font-weight: bold;">זווית אחורית</figcaption>
+        </figure>
+        <figure>
+            <img src="P3.png" alt="זווית מצד אחד">
+            <figcaption style="color: #007bff; margin-top: 8px; font-weight: bold;">זווית מצד אחד</figcaption>
+        </figure>
+        <figure>
+            <img src="P4.png" alt="זווית מצד שני">
+            <figcaption style="color: #007bff; margin-top: 8px; font-weight: bold;">זווית מצד שני</figcaption>
+        </figure>
+    </div>
+    <div style="max-width: 850px; margin: 40px auto; text-align: center; line-height: 1.8; color: #e0e0e0; font-size: 1.1rem; padding: 0 20px; direction: rtl;">
+        <p style="text-align: center; margin: 0;">
+            במהלך לימודי בהנדסאים התחברתי מאוד למקצוע אלקטרוניקה ומחשבים וחשתבי על פרויקט משמעותי מעניין ומאתגר שאלמד ממנו הרבה גם בתחום האלקטרוניקה והמחשבים וגם על עולם הצבא.<br>
+            בעקבות המלחמה בארץ חשבתי על רעיון מה בעיניי היה יכול לעזור עבור שמירה על שטחים מעבר לקו הגבול של המדינה שלנו.<br>
+            הגעתי להחלטה שנכון ליצור "רובוט רואה יורה" שכאשר מתגלים במכ"ם אובייקטים התותח מסתנכרן יחד עם המכ"ם ויורה בכל אובייקט הנמצא בשטח.<br>
+            המערכת מותאמת לםעולת לילה מאחר והשטח מואר מפרוז'קטור שבניתי בעזרת פירוק פנס יד והלחמת חוטים לכל חלק וסגירת מעגל בעזרת מפסק ששולט לי בעזרת הקוד שבניתי מתי להדליק (בלילה) ומתי לכבות (ביום).<br><br>
+            פרויקט זה היה מאוד מעניין במהלך העשייה, למדתי כל כך הרבה: להלחים, לבנות אתרים, הבנה של קודים ומערכות אלקטרוניות מסובכות, לתקשר בין שני מיקרו בקרים נפרדים, לבנות מפנס יד פנס שנשלט בעזרת הקוד שלי, ועוד מלא דברים משמעותיים שקידמו אותי.<br>
+            לכן פרויקט זה הוא את הלמידה שלי ואת קבלת המקצועיות הראשונה בתחום האלקטרוניקה והמחשבים.<br>
+            מודה למנחה שלי מרק טסליטסקי על מתן המלצות מקצועיות, הנחיות ותמיכה מקצועית במהלך כל לימודי בהנדסאים באופן כולל.
+        </p>
+    </div>
+    <div class="instruction-highlight">
+    💡 השתמש בתפריט הצד כדי לצפות בשרטוטים החשמליים, תיעוד הבדיקות והספר המלא.
+</div>
+</div>
+<div id="schem" class="category" style="padding: 10px; width: 100%;">
+        <h1 class="project-title-blue" style="text-align: center;">שרטוט חשמלי ראשוני</h1>
+        <div style="
+            width: 90%; 
+            max-width: 600px; 
+            margin: 0 auto 25px auto; 
+            direction: rtl; 
+            text-align: center; /* מרכוז התיבה */
+        ">
+            <p style="
+                font-size: 16px; 
+                line-height: 1.6; 
+                color: #ffffff; 
+                margin: 0;
+                font-family: sans-serif;
+                text-align: center; /* מרכוז הטקסט עצמו */
+                display: inline-block; /* מבטיח מרכוז בטלפונים מסוימים */
+                width: 100%;
+            ">
+                זהו השרטוט החשמלי הראשוני בפרויקט שלי, הרכיבים אליהם התחייבתי בהצעת הפרויקט. 
+                במהלך העבודה על הפרויקט ראיתי כיצד אוכל לשפר אותו ולעשות אותו יותר יעיל, יפה וברמה גבוהה יותר. 
+                הפרדתי את הפרויקט לשתי מערכות נפרדות שכל מערכת נמצאת עם מיקרו-בקר משלה והבקרים מתקשרים ביניהם. 
+                בהמשך ניתן לראות את השרטוט החשמלי הסופי עבור הפרויקט.
+            </p>
+        </div>
+        <div style="width: 100%; max-width: 850px; margin: 0 auto; background: white; border-radius: 8px; padding: 5px;">
+            <img src="Picture3.png" style="width: 100%; height: auto; display: block; border-radius: 4px;">
+        </div>
+        <h1 class="project-title-blue" style="text-align: center;">שרטוט חשמלי - התפתחות הפרויקט</h1>
+    <div style="
+        width: 90%; 
+        max-width: 650px; 
+        margin: 0 auto 25px auto; 
+        direction: rtl; 
+        text-align: center; 
+    ">
+        <p style="
+    font-size: 16px; 
+    line-height: 1.6; 
+    color: #ffffff; 
+    margin: 0;
+    font-family: sans-serif;
+    text-align: justify; 
+    text-align-last: center;
+    display: inline-block; 
+    width: 100%;
+    direction: rtl;
+">
+    ניתן לראות את השרטוט הסופי לפרויקט שעשיתי. במהלך הפרויקט למדתי המון דברים חדשים ונתקלתי במספר בעיות, שאחת העיקריות שבהן הייתה עומס רב על מערכת אחת המופעלת על ידי בקר בודד. 
+    מאחר וה-ESP32 הוא בקר המשמש לפרויקטים שאינם מיועדים לעומס תמידי חריג, נזקקתי להפריד את הפרויקט לשני חלקים המתקשרים ביניהם באמצעות פרוטוקול תקשורת ייחודי לבקר הנקרא ESP_NOW. 
+    התקשורת בין הבקרים מוגדרת כתקשורת מסוג <strong>סימפלקס (Simplex)</strong>, שכן היא חד-כיוונית: המערכת הראשונה מעבדת את נתוני הראדאר ושולחת פקודות ביצוע בלבד למערכת השנייה, ללא צורך בקבלת משוב חוזר. 
+    למעשה, המערכת הראשונה כוללת את הרדאר ואת שני מנועי הסרוו: על אחד מהם מותקן החיישן האולטרסוניק המסתובב, ועל המנוע השני, המסתנכרן עם הראשון במידה והתגלו אובייקטים, נמצא התותח האלקטרומגנטי שהלחמתי ידנית.
+</p>
+    </div>
+    <div style="width: 100%; max-width: 850px; margin: 0 auto; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">    
+        <div style="text-align: center; margin: 25px 0;">
+            <hr style="border: 0; border-top: 2px dashed #007bff; width: 50%; display: inline-block;">
+            <span style="display: block; color: #007bff; font-size: 12px; font-weight: bold; text-transform: uppercase;">שדרוג המערכת ל-ESP_NOW</span>
+        </div>
+        <p style="color: #333; font-weight: bold; margin-bottom: 8px; text-align: center; font-family: sans-serif;">שרטוט חשמלי סופי (מערכת כפולה)</p>
+        <img src=" Picture4.png" alt="שרטוט חשמלי סופי - ESP32 Transmitter & Receiver" style="width: 100%; height: auto; display: block; border-radius: 4px; border: 1px solid #eee;">
+    </div>
+    </div>
+
+<div id="assembly" class="category"> 
+    <h1 class="project-title-blue centered-text">רובה אלקטרומגנטי</h1>
+    <p class="centered-text">לחצו על התמונה כדי לצפות בסרטון.</p>
+    
+    <div class="video-section">
+        <img id="thumb1" src="Picture1.png" alt="רובה מגנטי"> 
+        <div id="player1" class="video-player">
+            <iframe id="iframe1" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+    <hr class="separator">
+    <h1 class="project-title-blue centered-text">מיני ראדאר</h1>
+    <p class="centered-text">לחצו על התמונה כדי לצפות בסרטון.</p>
+    <div class="video-section">
+        <img id="thumb2" src="Picture2.png" alt="מיני ראדאר">
+        <div id="player2" class="video-player">
+            <iframe id="iframe2" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+    <!-- קטגוריית בדיקות -->
+    <div id="tests" class="category">
+      <h1 class="project-title-blue">תיעוד בדיקות</h1>
+      <p class="centered-text">לחצו על התמונות כדי לצפות בסרטון</p>
+      <div class="doc-date">תיעוד 5.9.25</div>
+          <p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקת אופן פעולת חיישן אולטרסוניק ומדידת המתחים.</p>
+        <div class="video-section">
+          <img id="thumb3" src="https://img.youtube.com/vi/qJxPFXFTNug/hqdefault.jpg" alt="בדיקת אולטרסוניק">
+        <div id="player3" class="video-player">
+          <iframe id="iframe3" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        </div>
+        <div class="doc-date">תיעוד 21.9.25</div>
+          <p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקה: מופיעות נקודות צהובות על המסך שמציד את הרדאר.</p>
+        <div class="video-section">
+          <img id="thumb4" src="https://img.youtube.com/vi/8BiuVFxUo20/hqdefault.jpg" alt="בדיקות">
+        <div id="player4" class="video-player">
+          <iframe id="iframe4" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+       </div>
+        <div class="doc-date">תיעוד 23.9.25</div>
+          <p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקה: סינכרון של המנוע סרוו השני עם הסרוו הראשון.</p>
+        <div class="video-section">
+          <img id="thumb5" src="https://img.youtube.com/vi/eeDQquCGN5I/hqdefault.jpg" alt="בדיקות">
+        <div id="player5" class="video-player">
+         <iframe id="iframe5" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+       </div>
+          <div class="doc-date">תיעוד 27.9.25</div>
+          <p style="text-align:center; color:#ffffff; margin-bottom:10px;">סרטון זה מציג את אופן פעולת המסך טאץ' יחד עם בדיקת המתחים מהפינים במיקרו בקר אליהם המסך מחובר.</p>
+            <div class="video-section">
+             <img id="thumb6" src="https://img.youtube.com/vi/a2xaMos41Qk/hqdefault.jpg" alt="בדיקת מסך טאץ' ומתחים">
+            <div id="player6" class="video-player">
+             <iframe id="iframe6" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="doc-date">תיעוד 28.9.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">זהו סרטון שמציג את אופן הפעולה של המערכת לאחר שאני מצרף אליה מסך שני שלי בפרויקט.</p>
+        <div class="video-section">
+            <img id="thumb7" src="https://i.ytimg.com/vi/rToKhwszY90/0.jpg" alt="בדיקת מסך שני">
+            <div id="player7" class="video-player">
+                <iframe id="iframe7" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="doc-date">תיעוד 3.10.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">סרטון של אופן הפעולה של של הממסר הכפול</p>
+        <div class="video-section">
+            <img id="thumb8" src="https://i.ytimg.com/vi/T7QlbvXVhSo/0.jpg" alt="ממסר כפול אופן פעולה">
+            <div id="player8" class="video-player">
+                <iframe id="iframe8" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+          <div class="doc-date">תיעוד 10.10.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">אופן פעולת חיישן טמפרטורה</p>
+        <div class="video-section">
+            <img id="thumb9"  src="https://i.ytimg.com/vi/kOMxanI2hQE/0.jpg" alt="LM75">
+            <div id="player9" class="video-player">
+                <iframe id="iframe9" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="doc-date">תיעוד 17.10.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">סרטון אופן פעולת  הטאץ במסך TFT</p>
+        <div class="video-section">
+            <img id="thumb10" src="https://i.ytimg.com/vi/wPKWHskcr4U/maxresdefault.jpg" alt="טאץ במסך יחד עם עיצוב כפתורים">
+            <div id="player10" class="video-player">
+                <iframe id="iframe10" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="doc-date">תיעוד 25.10.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">הוספת כפתור נוסף למסך ובדיקת אופן פעולת חיישן טמפרטורה</p>
+        <div class="video-section">
+            <img id="thumb11" src="https://i.ytimg.com/vi/AhsRNy-44W4/maxresdefault.jpg" alt="הוספת כפתור נוסף למסך">
+            <div id="player11" class="video-player">
+                <iframe id="iframe11" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+           </div>
+           </div>
+          <div class="video-section">
+          <img id="thumb12" src="https://i.ytimg.com/vi/1TjnN75Hobc/maxresdefault.jpg" alt="">
+          <div id="player12" class="video-player">
+              <iframe id="iframe12" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="doc-date">תיעוד 1.11.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;"> בדיקת אופן פעולת LDR יחד עם המודול</p>
+        <div class="video-section">
+          <img id="thumb13" src="https://i.ytimg.com/vi/BH0AUaHqhAI/maxresdefault.jpg" alt="בדיקת LDR עם המודול">
+        <div id="player13" class="video-player">
+        <iframe id="iframe13" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+       </div>
+     </div>
+     <div class="doc-date">תיעוד 8.11.25</div>
+        <p style="text-align:center; color:#ffffff; margin-bottom:10px;">תיעוד אופן פעולת המערכת השנייה, חיבור החיישן אור אל המערכת כולה</p>
+        <div class="video-section">
+          <img id="thumb14" src="https://i.ytimg.com/vi/ooBv1BanwWM/maxresdefault.jpg" alt="תיעוד אופן פעולת המערכת השנייה">
+          <div id="player14" class="video-player">
+            <iframe id="iframe14" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+<div class="doc-date">תיעוד 15.11.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px; font-family: sans-serif;"> בדיקת תקשורת בין שני הבקרים אופן פעולת תקשורת בין הבקרים</p>
+<div class="video-section" style="position: relative; width: 100%; max-width: 600px; margin: 0 auto 35px auto; border: 2px solid #007bff; border-radius: 8px; overflow: hidden;">
+    <img id="thumb15" src="https://img.youtube.com/vi/oa2_R1PLNHI/0.jpg" 
+         alt="בדיקת תקשורת" 
+         style="width:100%; cursor: pointer; display: block;">
+    <div id="player15" class="video-player">
+        <iframe id="iframe15" src="" frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen style="width:100%; height: 337px;">
+        </iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 22.11.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקת אופן פעולה ותקשורת בין שתי המערכות</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb16" src="https://img.youtube.com/vi/cFMXjWujSgI/hqdefault.jpg" alt="בדיקת תקשורת בין שני הבקרים">
+    <div id="player16" class="video-player">
+        <iframe id="iframe16" src="https://www.youtube.com/embed/cFMXjWujSgI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 29.11.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">פירוק פנס יד ובניית מיני פרוז'קטור מחלקיו - בדיקת מתחים וחיבור לממסר</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb17" src="https://img.youtube.com/vi/JK8zP62lnlc/hqdefault.jpg" alt="פירוק ובניית מיני פרוז'קטור">
+    <div id="player17" class="video-player">
+        <iframe id="iframe17" src="https://www.youtube.com/embed/JK8zP62lnlc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 5.12.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">אופן פעולת המערכת השנייה - חיבור המיני פרוז'קטור למערכת</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb18" src="https://img.youtube.com/vi/0NTX0XyeGn0/hqdefault.jpg" alt="אופן פעולה וחיבור מיני פרוז'קטור">
+    <div id="player18" class="video-player">
+        <iframe id="iframe18" src="https://www.youtube.com/embed/0NTX0XyeGn0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 13.12.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">בנייה ראשונית עבור המערכת בקרה וניתור בפרויקט</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb19" src="https://img.youtube.com/vi/TfWN_WLRvNg/hqdefault.jpg" alt="חלק ראשוני של הבנייה עבור מערכת השנייה" style="width:100%; max-width:560px; display:block; margin: 0 auto 10px auto;">
+    <div id="player19" class="video-player" style="text-align:center;">
+        <iframe id="iframe19" width="560" height="315" src="https://www.youtube.com/embed/TfWN_WLRvNg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 21.12.25</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">סרטון מלא של בניית הדגם לפרוייקט</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb20" src="https://img.youtube.com/vi/xRKDXMoh2Vc/hqdefault.jpg" alt="סרטון מלא של בניית הדגם לפרוייקט" style="width:100%; max-width:560px; display:block; margin: 0 auto 10px auto;">
+    <div id="player20" class="video-player" style="text-align:center;">
+        <iframe id="iframe20" width="560" height="315" src="https://www.youtube.com/embed/xRKDXMoh2Vc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div> <p style="text-align:center; color:#ffffff; margin-bottom:10px;">אופן הפעולה של המערכת יחד עם הדגם (בסרטון מקוצר)</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb21" src="https://img.youtube.com/vi/92bq_Piz7M0/hqdefault.jpg" alt="אופן הפעולה של המערכת יחד עם הדגם (בסרטון מקוצר)" style="width:100%; max-width:560px; display:block; margin: 0 auto 10px auto;">
+    <div id="player21" class="video-player" style="text-align:center;">
+        <iframe id="iframe21" width="560" height="315" src="https://www.youtube.com/embed/92bq_Piz7M0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div> 
+<div class="doc-date">תיעוד 3.1.26</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקת אופן פעולה של הדגם פרויקט</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb22" src="https://img.youtube.com/vi/iM_ebDkwi1s/hqdefault.jpg" alt="בדיקת תקינות הפעולה והתקשורת בדגם" style="width:100%; max-width:560px; display:block; margin: 0 auto 10px auto;">
+    <div id="player22" class="video-player" style="text-align:center;">
+        <iframe id="iframe22" width="560" height="315" src="https://www.youtube.com/embed/iM_ebDkwi1s" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="doc-date">תיעוד 17.1.26</div>
+<p style="text-align:center; color:#ffffff; margin-bottom:10px;">בדיקת אופן פעולה סופי של מערכת המכ"ם, התותח והחיישנים</p>
+<div class="video-section" style="margin-bottom: 25px;">
+    <img id="thumb23" src="https://img.youtube.com/vi/zxFZG9q2c7Y/hqdefault.jpg" alt="בדיקת סנכרון תותח, חיישן אור וטמפרטורה" style="width:100%; max-width:560px; display:block; margin: 0 auto 10px auto;">
+    <div id="player23" class="video-player" style="text-align:center;">
+        <iframe id="iframe23" width="560" height="315" src="https://www.youtube.com/embed/zxFZG9q2c7Y" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+    </div>
+    <div id="book" class="category">
+     <h1 class="project-title-blue">הספר פרויקט שלי</h1>
+     <p class="centered-text">לחצו להורדת הקובץ המלא</p>
+       <p style="font-size: 1.4rem; line-height: 1.6; text-align: center; padding: 0 20px; max-width: 800px; margin: 0 auto;">
+        זהו הספר פרוייקט שלי. כאן ניתן למצוא סיכום על כל הרכיבים בהם השתמשתי. 
+        בנוסף, בספר זה ניתן למצוא קישורים לסרטונים שלי בהם אני מדגים את אופן הבנייה של 
+        הערכות ושל אופן פעולת המערכות השונות. כמו כן, ניתן למצוא את הקישור אל האתר 
+        בו אתם נמצאים ממש עכשיו, ובו גם כן ניתן לראות את סרטוני התיעוד שהם למעשה חלק 
+        בלתי נפרד מהתהליך של בניית הפרויקט שלי וחלק משמעותי מאוד מהלמידה עליו.
+    </p>
+     <div style="text-align: center; margin-top: 40px;">
+       <a 
+       href="/project_book.pdf"   download="הספר-פרויקט-שלי.pdf"
+       target="_blank"
+       class="download-button"
+       >
+       ⬇️ להורדת הספר (PDF)
+       </a>
+     </div>
+    </div>
+  </main>
+
+  <script>
+ // פונקציה לפתיחה/סגירה של תפריט ההמבורגר
+ function toggleMenu() {
+ const sidebar = document.querySelector('.sidebar');
+ sidebar.classList.toggle('open');
+ }
+
+ // פונקציה לשינוי קטגוריה (כוללת סגירה אוטומטית במובייל)
+ function showCategory(categoryId) {
+ document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+ document.getElementById(categoryId).classList.add('active');
+
+ // סגירת התפריט לאחר בחירה (במובייל)
+ const sidebar = document.querySelector('.sidebar');
+ if (sidebar.classList.contains('open')) {
+ sidebar.classList.remove('open');
+ }
+ }
+
+ // פונקציה להפעלת סרטון בלחיצה על התמונה
+ function setupVideo(thumbId, playerId, iframeId, url) {
+ const thumb = document.getElementById(thumbId); // התמונה לחיצה
+ const player = document.getElementById(playerId); // קונטיינר הסרטון
+ const iframe = document.getElementById(iframeId); // iframe יוטיוב
+
+ thumb.addEventListener('click', e => {
+ e.stopPropagation(); // מונע הפצת האירוע לגוף הדף
+ iframe.src = url + "?autoplay=1"; // הפעלת הסרטון אוטומטית
+ thumb.style.display = "none"; // הסתרת התמונה
+ player.classList.add("show"); // הצגת הקונטיינר עם ה-iframe
+ });
+
+ function closeVideo() {
+ iframe.src = ""; // עצירת הסרטון
+ player.classList.remove("show"); // הסתרת הקונטיינר
+ thumb.style.display = "block"; // הצגת התמונה מחדש
+ }
+
+ // סגירת הסרטון בלחיצה מחוץ לו
+ document.body.addEventListener('click', e => {
+ if (player.classList.contains("show") && !player.contains(e.target) && !thumb.contains(e.target)) {
+ closeVideo();
+ }
+ });
+ }
+
+   // הגדרת כל שלושת הסרטונים
+ setupVideo("thumb1", "player1", "iframe1", "https://www.youtube.com/embed/5IMt-HXeCIk");
+ setupVideo("thumb2", "player2", "iframe2", "https://www.youtube.com/embed/TOxmNhN4LiU");
+ setupVideo("thumb3", "player3", "iframe3", "https://www.youtube.com/embed/qJxPFXFTNug");
+ setupVideo("thumb4", "player4", "iframe4", "https://www.youtube.com/embed/8BiuVFxUo20"); 
+ setupVideo("thumb5", "player5", "iframe5", "https://www.youtube.com/embed/eeDQquCGN5I");
+ setupVideo("thumb6", "player6", "iframe6", "https://www.youtube.com/embed/a2xaMos41Qk");
+ setupVideo("thumb7", "player7", "iframe7", "https://www.youtube.com/embed/rToKhwszY90");
+ setupVideo("thumb8", "player8", "iframe8", "https://www.youtube.com/embed/T7QlbvXVhSo");
+ setupVideo("thumb9", "player9", "iframe9", "https://www.youtube.com/embed/kOMxanI2hQE");
+setupVideo("thumb10", "player10", "iframe10", "https://www.youtube.com/embed/wPKWHskcr4U");
+ setupVideo("thumb11", "player11", "iframe11", "https://www.youtube.com/embed/AhsRNy-44W4");
+setupVideo("thumb12", "player12", "iframe12", "https://www.youtube.com/embed/1TjnN75Hobc");
+setupVideo("thumb13", "player13", "iframe13", "https://www.youtube.com/embed/BH0AUaHqhAI");
+setupVideo("thumb14", "player14", "iframe14", "https://www.youtube.com/embed/ooBv1BanwWM");
+setupVideo("thumb15", "player15", "iframe15", "https://www.youtube.com/embed/oa2_R1PLNHI");
+setupVideo("thumb16", "player16", "iframe16", "https://www.youtube.com/embed/cFMXjWujSgI");
+setupVideo("thumb17", "player17", "iframe17", "https://www.youtube.com/embed/JK8zP62lnlc");
+setupVideo("thumb18", "player18", "iframe18", "https://www.youtube.com/embed/0NTX0XyeGn0");
+setupVideo("thumb19", "player19", "iframe19", "https://www.youtube.com/embed/TfWN_WLRvNg");
+setupVideo("thumb20", "player20", "iframe20", "https://www.youtube.com/embed/xRKDXMoh2Vc");
+setupVideo("thumb21", "player21", "iframe21", "https://www.youtube.com/embed/92bq_Piz7M0");
+setupVideo("thumb22", "player22", "iframe22", "https://www.youtube.com/embed/iM_ebDkwi1s");
+setupVideo("thumb23", "player23", "iframe23", "https://www.youtube.com/embed/zxFZG9q2c7Y");
+  </script>
+</body>
+</html>
